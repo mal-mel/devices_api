@@ -1,0 +1,125 @@
+openapi: 3.0.1
+info:
+  title: Devices API
+  contact: { }
+  version: "0.1"
+servers:
+  - url: //localhost:8080/api/v1
+paths:
+  /device/{deviceId}:
+    get:
+      summary: Получение девайса по его ID
+      operationId: getDevice
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID девайса
+          required: true
+          schema:
+            type: string
+            format: uuid
+      responses:
+        200:
+          description: Данные о девайсе
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/device'
+                  status_code:
+                    type: integer
+        400:
+          description: Неверный формат данных
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/httpError'
+        404:
+          description: Девайс не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/httpError'
+        500:
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/httpError'
+
+    post:
+      summary: Сохранение нового девайса
+      operationId: saveDevice
+      parameters:
+        - name: deviceId
+          in: path
+          description: ID девайса
+          required: true
+          schema:
+            type: string
+            format: uuid
+      requestBody:
+        description: Данные о девайсе
+        content:
+          application/json:
+            schema:
+              $ref: '#/components/schemas/device'
+        required: true
+      responses:
+        200:
+          description: Данные успешно сохранены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/device'
+                  status_code:
+                    type: integer
+        400:
+          description: Неверный формат данных
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/httpError'
+        409:
+          description: Данный девайс уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/httpError'
+        500:
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/httpError'
+
+components:
+  schemas:
+    httpError:
+      type: object
+      properties:
+        description:
+          type: string
+        error:
+          type: string
+        status_code:
+          type: integer
+
+    device:
+      type: object
+      properties:
+        id:
+          type: string
+        is_charging:
+          type: boolean
+        battery_level:
+          type: number
+        vendor:
+          type: string
+        tags:
+          type: object
