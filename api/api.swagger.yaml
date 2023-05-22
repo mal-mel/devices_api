@@ -98,6 +98,136 @@ paths:
               schema:
                 $ref: '#/components/schemas/httpError'
 
+  /devices/tag/{tag}:
+    get:
+      summary: Получение девайса по тегу
+      operationId: getDeviceByTag
+      parameters:
+        - name: tag
+          in: path
+          description: Тэг
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Данные о девайсе
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/device'
+                  status_code:
+                    type: integer
+        400:
+          description: Неверный формат данных
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/httpError'
+        404:
+          description: Девайс не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/httpError'
+        500:
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/httpError'
+
+  /devices/vendor/{vendor}:
+    get:
+      summary: Получение девайса по вендору
+      operationId: getDeviceByVendor
+      parameters:
+        - name: vendor
+          in: path
+          description: Вендор
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Данные о девайсе
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    type: array
+                    items:
+                      $ref: '#/components/schemas/device'
+                  status_code:
+                    type: integer
+        400:
+          description: Неверный формат данных
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/httpError'
+        404:
+          description: Девайс не найден
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/httpError'
+        500:
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/httpError'
+
+  /vendor/{vendorName}:
+    post:
+      summary: Сохранение нового вендора
+      operationId: saveVendor
+      parameters:
+        - name: vendorName
+          in: path
+          description: Наименование вендора
+          required: true
+          schema:
+            type: string
+      responses:
+        200:
+          description: Данные успешно сохранены
+          content:
+            application/json:
+              schema:
+                type: object
+                properties:
+                  data:
+                    $ref: '#/components/schemas/vendor'
+                  status_code:
+                    type: integer
+        400:
+          description: Неверный формат данных
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/httpError'
+        409:
+          description: Данный вендор уже существует
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/httpError'
+        500:
+          description: Ошибка сервера
+          content:
+            application/json:
+              schema:
+                $ref: '#/components/schemas/httpError'
+
 components:
   schemas:
     httpError:
@@ -123,3 +253,11 @@ components:
           type: string
         tags:
           type: object
+
+    vendor:
+      type: object
+      properties:
+        id:
+          type: integer
+        name:
+          type: string

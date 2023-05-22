@@ -27,6 +27,12 @@ type HttpError struct {
 	StatusCode  *int    `json:"status_code,omitempty"`
 }
 
+// Vendor defines model for vendor.
+type Vendor struct {
+	Id   *int    `json:"id,omitempty"`
+	Name *string `json:"name,omitempty"`
+}
+
 // SaveDeviceJSONBody defines parameters for SaveDevice.
 type SaveDeviceJSONBody Device
 
@@ -41,6 +47,15 @@ type ServerInterface interface {
 	// Сохранение нового девайса
 	// (POST /device/{deviceId})
 	SaveDevice(w http.ResponseWriter, r *http.Request, deviceId string)
+	// Получение девайса по тегу
+	// (GET /devices/tag/{tag})
+	GetDeviceByTag(w http.ResponseWriter, r *http.Request, tag string)
+	// Получение девайса по вендору
+	// (GET /devices/vendor/{vendor})
+	GetDeviceByVendor(w http.ResponseWriter, r *http.Request, vendor string)
+	// Сохранение нового вендора
+	// (POST /vendor/{vendorName})
+	SaveVendor(w http.ResponseWriter, r *http.Request, vendorName string)
 }
 
 // ServerInterfaceWrapper converts contexts to parameters.
@@ -95,6 +110,84 @@ func (siw *ServerInterfaceWrapper) SaveDevice(w http.ResponseWriter, r *http.Req
 
 	var handler = func(w http.ResponseWriter, r *http.Request) {
 		siw.Handler.SaveDevice(w, r, deviceId)
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler(w, r.WithContext(ctx))
+}
+
+// GetDeviceByTag operation middleware
+func (siw *ServerInterfaceWrapper) GetDeviceByTag(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "tag" -------------
+	var tag string
+
+	err = runtime.BindStyledParameter("simple", false, "tag", chi.URLParam(r, "tag"), &tag)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "tag", Err: err})
+		return
+	}
+
+	var handler = func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetDeviceByTag(w, r, tag)
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler(w, r.WithContext(ctx))
+}
+
+// GetDeviceByVendor operation middleware
+func (siw *ServerInterfaceWrapper) GetDeviceByVendor(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "vendor" -------------
+	var vendor string
+
+	err = runtime.BindStyledParameter("simple", false, "vendor", chi.URLParam(r, "vendor"), &vendor)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "vendor", Err: err})
+		return
+	}
+
+	var handler = func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.GetDeviceByVendor(w, r, vendor)
+	}
+
+	for _, middleware := range siw.HandlerMiddlewares {
+		handler = middleware(handler)
+	}
+
+	handler(w, r.WithContext(ctx))
+}
+
+// SaveVendor operation middleware
+func (siw *ServerInterfaceWrapper) SaveVendor(w http.ResponseWriter, r *http.Request) {
+	ctx := r.Context()
+
+	var err error
+
+	// ------------- Path parameter "vendorName" -------------
+	var vendorName string
+
+	err = runtime.BindStyledParameter("simple", false, "vendorName", chi.URLParam(r, "vendorName"), &vendorName)
+	if err != nil {
+		siw.ErrorHandlerFunc(w, r, &InvalidParamFormatError{ParamName: "vendorName", Err: err})
+		return
+	}
+
+	var handler = func(w http.ResponseWriter, r *http.Request) {
+		siw.Handler.SaveVendor(w, r, vendorName)
 	}
 
 	for _, middleware := range siw.HandlerMiddlewares {
@@ -222,6 +315,15 @@ func HandlerWithOptions(si ServerInterface, options ChiServerOptions) http.Handl
 	})
 	r.Group(func(r chi.Router) {
 		r.Post(options.BaseURL+"/device/{deviceId}", wrapper.SaveDevice)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/devices/tag/{tag}", wrapper.GetDeviceByTag)
+	})
+	r.Group(func(r chi.Router) {
+		r.Get(options.BaseURL+"/devices/vendor/{vendor}", wrapper.GetDeviceByVendor)
+	})
+	r.Group(func(r chi.Router) {
+		r.Post(options.BaseURL+"/vendor/{vendorName}", wrapper.SaveVendor)
 	})
 
 	return r

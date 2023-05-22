@@ -39,6 +39,60 @@ func (env *Env) GetDevice(w http.ResponseWriter, r *http.Request, deviceId strin
 	}
 }
 
+func (env *Env) GetDeviceByVendor(w http.ResponseWriter, r *http.Request, vendor string) {
+	ctx := r.Context()
+
+	devices, err := env.DB.GetDevicesByVendor(ctx, vendor)
+	if err != nil {
+		e := UnknownError
+		env.Log.Error(e.errorMessage(err))
+		_ = e.sendError(w)
+		return
+	}
+
+	if devices == nil {
+		e := DevicesByTagNotFoundError
+		env.Log.Error(e.errorMessage(err))
+		_ = e.sendError(w)
+		return
+	}
+
+	err = sendResponse(w, http.StatusOK, devices)
+	if err != nil {
+		e := UnknownError
+		env.Log.Error(e.errorMessage(err))
+		_ = e.sendError(w)
+		return
+	}
+}
+
+func (env *Env) GetDeviceByTag(w http.ResponseWriter, r *http.Request, tag string) {
+	ctx := r.Context()
+
+	devices, err := env.DB.GetDevicesByTag(ctx, tag)
+	if err != nil {
+		e := UnknownError
+		env.Log.Error(e.errorMessage(err))
+		_ = e.sendError(w)
+		return
+	}
+
+	if devices == nil {
+		e := DevicesByTagNotFoundError
+		env.Log.Error(e.errorMessage(err))
+		_ = e.sendError(w)
+		return
+	}
+
+	err = sendResponse(w, http.StatusOK, devices)
+	if err != nil {
+		e := UnknownError
+		env.Log.Error(e.errorMessage(err))
+		_ = e.sendError(w)
+		return
+	}
+}
+
 func (env *Env) SaveDevice(w http.ResponseWriter, r *http.Request, deviceId string) {
 	var err error
 
@@ -57,6 +111,8 @@ func (env *Env) SaveDevice(w http.ResponseWriter, r *http.Request, deviceId stri
 					Error(txErr)
 			}
 			env.Log.WithError(err).Error("couldn't save device")
+		} else {
+			_ = txStorage.CommitTransaction(ctx)
 		}
 	}()
 
@@ -124,5 +180,3 @@ func (env *Env) SaveDevice(w http.ResponseWriter, r *http.Request, deviceId stri
 		return
 	}
 }
-
-// TODO: метод создания вендора, получение нескольких девайсов по вендору или тегу

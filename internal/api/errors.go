@@ -18,34 +18,42 @@ const (
 	UnknownError Err = iota
 	UUIDParsingError
 	DeviceNotFoundError
+	DevicesByTagNotFoundError
+	DevicesByVendorNotFoundError
 	DeviceAlreadyExistsError
 	DeviceBodyParsingError
 	UnknownVendorNameError
 )
 
 var errorText = map[Err]string{
-	UnknownError:             "Unknown error",
-	UUIDParsingError:         "UUID parsing error",
-	DeviceNotFoundError:      "Device not found error",
-	DeviceAlreadyExistsError: "Device already exists error",
-	DeviceBodyParsingError:   "Device body parsing error",
-	UnknownVendorNameError:   "Unknown vendor name error",
+	UnknownError:                 "Unknown error",
+	UUIDParsingError:             "UUID parsing error",
+	DeviceNotFoundError:          "Device not found error",
+	DevicesByTagNotFoundError:    "Devices by tag name not found error",
+	DevicesByVendorNotFoundError: "Devices by vendor not found error",
+	DeviceAlreadyExistsError:     "Device already exists error",
+	DeviceBodyParsingError:       "Device body parsing error",
+	UnknownVendorNameError:       "Unknown vendor name error",
 }
 
 var errorDescription = map[Err]string{
-	UUIDParsingError:         "Не удалось прочитать идентификатор",
-	DeviceNotFoundError:      "Не удалось получить объект",
-	DeviceAlreadyExistsError: "Данный девайс уже существует",
-	DeviceBodyParsingError:   "Ошибка при обработке данных девайса",
-	UnknownVendorNameError:   "Неизвестное имя вендора",
+	UnknownError:                 "Неизвестная ебанина",
+	UUIDParsingError:             "Не удалось прочитать идентификатор",
+	DeviceNotFoundError:          "Не удалось получить объект",
+	DevicesByTagNotFoundError:    "Не удалось найти девайсы по заданному тегу",
+	DevicesByVendorNotFoundError: "Не удалось найти девайсы по заданному вендору",
+	DeviceAlreadyExistsError:     "Данный девайс уже существует",
+	DeviceBodyParsingError:       "Ошибка при обработке данных девайса",
+	UnknownVendorNameError:       "Неизвестное имя вендора",
 }
 
 var errorStatus = map[Err]int{
-	UUIDParsingError:         http.StatusBadRequest,
-	DeviceNotFoundError:      http.StatusNotFound,
-	DeviceAlreadyExistsError: http.StatusConflict,
-	DeviceBodyParsingError:   http.StatusBadRequest,
-	UnknownVendorNameError:   http.StatusBadRequest,
+	UUIDParsingError:          http.StatusBadRequest,
+	DeviceNotFoundError:       http.StatusNotFound,
+	DevicesByTagNotFoundError: http.StatusNotFound,
+	DeviceAlreadyExistsError:  http.StatusConflict,
+	DeviceBodyParsingError:    http.StatusBadRequest,
+	UnknownVendorNameError:    http.StatusBadRequest,
 }
 
 func (c Err) errorMessage(e error) string {

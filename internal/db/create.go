@@ -21,3 +21,14 @@ func (db *PGCon) SaveDevice(ctx context.Context, device e.Device, vendorId int) 
 
 	return nil
 }
+
+func (db *PGCon) SaveVendor(ctx context.Context, vendor e.Vendor) error {
+	insertQuery := `INSERT INTO vendor (name) VALUES ($1)`
+
+	_, err := db.Connection.Exec(ctx, insertQuery, vendor.Name)
+	if err != nil {
+		return err
+	}
+
+	return nil
+}
