@@ -1,11 +1,11 @@
 version: "3.6"
 services:
-#  api:
-#    container_name: device_api
-#    image: device_api:latest
-#    environment:
-#      DB_USER: admin
-#      DB_PASS: admin
+  api:
+    container_name: device_api
+    image: device_api:latest
+    environment:
+      DB_USER: admin
+      DB_PASS: admin
 
   postgres:
     container_name: postgres_device
